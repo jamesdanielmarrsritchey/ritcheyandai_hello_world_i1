@@ -1,0 +1,318 @@
+jamesdanielmarrsritchey: Using C++, write a program which returns "Hello World!"
+
+GitHub Copilot: Sure, here's a simple C++ program that prints "Hello World!" to the console:
+
+```cpp
+#include <iostream>
+
+int main() {
+    std::cout << "Hello World!";
+    return 0;
+}
+```
+
+In this program:
+
+- `#include <iostream>` includes the iostream standard library, which allows for input/output operations.
+- `int main()` is the main function where the program starts execution.
+- `std::cout << "Hello World!";` prints the string "Hello World!" to the console.
+- `return 0;` ends the main function and indicates that the program has run successfully.
+
+jamesdanielmarrsritchey: Add an argument formatted as "--string value", which if present defines a replacement for "World!".
+
+GitHub Copilot: You can use the `getopt` library in C++ to parse command-line arguments. Here's how you can modify the program to accept a `--string` argument:
+
+```cpp
+#include <iostream>
+#include <unistd.h>
+#include <getopt.h>
+
+int main(int argc, char *argv[]) {
+    std::string defaultString = "World!";
+    int opt;
+    static struct option long_options[] = {
+        {"string", required_argument, 0, 's'},
+        {0, 0, 0, 0}
+    };
+
+    while ((opt = getopt_long(argc, argv, "s:", long_options, NULL)) != -1) {
+        switch (opt) {
+            case 's':
+                defaultString = optarg;
+                break;
+            default:
+                std::cerr << "Usage: " << argv[0] << " [--string value]\n";
+                return 1;
+        }
+    }
+
+    std::cout << "Hello " << defaultString << "!\n";
+    return 0;
+}
+```
+
+In this program:
+
+- `getopt_long` is used to parse the command-line arguments.
+- The `--string` argument is defined in the `long_options` array.
+- If the `--string` argument is provided, its value replaces the default "World!" string.
+- If an unknown argument is provided, the program prints a usage message and exits with a non-zero status code.
+
+jamesdanielmarrsritchey: Add an argument, formatted as "--loops value" which defines how many times the return value should be outputted.
+
+GitHub Copilot: You can add another option to the `long_options` array to handle the `--loops` argument. Here's how you can modify the program:
+
+```cpp
+#include <iostream>
+#include <unistd.h>
+#include <getopt.h>
+
+int main(int argc, char *argv[]) {
+    std::string defaultString = "World!";
+    int loops = 1;
+    int opt;
+    static struct option long_options[] = {
+        {"string", required_argument, 0, 's'},
+        {"loops", required_argument, 0, 'l'},
+        {0, 0, 0, 0}
+    };
+
+    while ((opt = getopt_long(argc, argv, "s:l:", long_options, NULL)) != -1) {
+        switch (opt) {
+            case 's':
+                defaultString = optarg;
+                break;
+            case 'l':
+                loops = std::stoi(optarg);
+                break;
+            default:
+                std::cerr << "Usage: " << argv[0] << " [--string value] [--loops value]\n";
+                return 1;
+        }
+    }
+
+    for (int i = 0; i < loops; i++) {
+        std::cout << "Hello " << defaultString << "!\n";
+    }
+
+    return 0;
+}
+```
+
+In this program:
+
+- The `--loops` argument is defined in the `long_options` array.
+- If the `--loops` argument is provided, its value is converted to an integer and used to determine how many times the message is printed.
+- If an unknown argument is provided, the program prints a usage message and exits with a non-zero status code.
+
+jamesdanielmarrsritchey: The default value of "World!" should just be "World".
+
+GitHub Copilot: Sure, you can easily change the default value of `defaultString` from "World!" to "World". Here's the updated code:
+
+```cpp
+#include <iostream>
+#include <unistd.h>
+#include <getopt.h>
+
+int main(int argc, char *argv[]) {
+    std::string defaultString = "World"; // Changed default value
+    int loops = 1;
+    int opt;
+    static struct option long_options[] = {
+        {"string", required_argument, 0, 's'},
+        {"loops", required_argument, 0, 'l'},
+        {0, 0, 0, 0}
+    };
+
+    while ((opt = getopt_long(argc, argv, "s:l:", long_options, NULL)) != -1) {
+        switch (opt) {
+            case 's':
+                defaultString = optarg;
+                break;
+            case 'l':
+                loops = std::stoi(optarg);
+                break;
+            default:
+                std::cerr << "Usage: " << argv[0] << " [--string value] [--loops value]\n";
+                return 1;
+        }
+    }
+
+    for (int i = 0; i < loops; i++) {
+        std::cout << "Hello " << defaultString << "!\n";
+    }
+
+    return 0;
+}
+```
+
+jamesdanielmarrsritchey: Add a delimiter argument, formatted as "--delimiter value" which goes between each instance of the return message. If the delimiter is "\n" treat it as a new line. If the delimiter is "\t" treat it as a tab.
+
+GitHub Copilot: You can add another option to the `long_options` array to handle the `--delimiter` argument. Here's how you can modify the program:
+
+```cpp
+#include <iostream>
+#include <unistd.h>
+#include <getopt.h>
+
+int main(int argc, char *argv[]) {
+    std::string defaultString = "World";
+    std::string delimiter = "\n";
+    int loops = 1;
+    int opt;
+    static struct option long_options[] = {
+        {"string", required_argument, 0, 's'},
+        {"loops", required_argument, 0, 'l'},
+        {"delimiter", required_argument, 0, 'd'},
+        {0, 0, 0, 0}
+    };
+
+    while ((opt = getopt_long(argc, argv, "s:l:d:", long_options, NULL)) != -1) {
+        switch (opt) {
+            case 's':
+                defaultString = optarg;
+                break;
+            case 'l':
+                loops = std::stoi(optarg);
+                break;
+            case 'd':
+                if (std::string(optarg) == "\\n") {
+                    delimiter = "\n";
+                } else if (std::string(optarg) == "\\t") {
+                    delimiter = "\t";
+                } else {
+                    delimiter = optarg;
+                }
+                break;
+            default:
+                std::cerr << "Usage: " << argv[0] << " [--string value] [--loops value] [--delimiter value]\n";
+                return 1;
+        }
+    }
+
+    for (int i = 0; i < loops; i++) {
+        if (i != 0) {
+            std::cout << delimiter;
+        }
+        std::cout << "Hello " << defaultString << "!";
+    }
+
+    std::cout << "\n";
+    return 0;
+}
+```
+
+In this program:
+
+- The `--delimiter` argument is defined in the `long_options` array.
+- If the `--delimiter` argument is provided, its value is used as the delimiter between messages. If the value is "\\n" or "\\t", it is replaced with a newline or tab character, respectively.
+- If an unknown argument is provided, the program prints a usage message and exits with a non-zero status code.
+
+jamesdanielmarrsritchey: If no delimiter is provided, the default delimiter should be nothing.
+
+GitHub Copilot: Sure, you can easily change the default value of `delimiter` from "\n" to "". Here's the updated code:
+
+```cpp
+std::string delimiter = ""; // Changed default value
+int loops = 1;
+int opt;
+static struct option long_options[] = {
+    {"string", required_argument, 0, 's'},
+    {"loops", required_argument, 0, 'l'},
+    {"delimiter", required_argument, 0, 'd'},
+    {0, 0, 0, 0}
+};
+
+while ((opt = getopt_long(argc, argv, "s:l:d:", long_options, NULL)) != -1) {
+    switch (opt) {
+        case 's':
+            defaultString = optarg;
+            break;
+        case 'l':
+            loops = std::stoi(optarg);
+            break;
+        case 'd':
+            if (std::string(optarg) == "\\n") {
+                delimiter = "\n";
+            } else if (std::string(optarg) == "\\t") {
+                delimiter = "\t";
+            } else {
+                delimiter = optarg;
+            }
+            break;
+        default:
+            std::cerr << "Usage: " << argv[0] << " [--string value] [--loops value] [--delimiter value]\n";
+            return 1;
+    }
+}
+
+for (int i = 0; i < loops; i++) {
+    if (i != 0) {
+        std::cout << delimiter;
+    }
+    std::cout << "Hello " << defaultString << "!";
+}
+
+std::cout << "\n";
+return 0;
+```
+
+Now, if no `--delimiter` argument is provided, the messages will be printed without any delimiter.
+
+jamesdanielmarrsritchey: Apply this suggestion to the full code.
+
+GitHub Copilot: Sure, here's the full code with the default delimiter set to an empty string:
+
+```cpp
+#include <iostream>
+#include <unistd.h>
+#include <getopt.h>
+
+int main(int argc, char *argv[]) {
+    std::string defaultString = "World";
+    std::string delimiter = ""; // Changed default value
+    int loops = 1;
+    int opt;
+    static struct option long_options[] = {
+        {"string", required_argument, 0, 's'},
+        {"loops", required_argument, 0, 'l'},
+        {"delimiter", required_argument, 0, 'd'},
+        {0, 0, 0, 0}
+    };
+
+    while ((opt = getopt_long(argc, argv, "s:l:d:", long_options, NULL)) != -1) {
+        switch (opt) {
+            case 's':
+                defaultString = optarg;
+                break;
+            case 'l':
+                loops = std::stoi(optarg);
+                break;
+            case 'd':
+                if (std::string(optarg) == "\\n") {
+                    delimiter = "\n";
+                } else if (std::string(optarg) == "\\t") {
+                    delimiter = "\t";
+                } else {
+                    delimiter = optarg;
+                }
+                break;
+            default:
+                std::cerr << "Usage: " << argv[0] << " [--string value] [--loops value] [--delimiter value]\n";
+                return 1;
+        }
+    }
+
+    for (int i = 0; i < loops; i++) {
+        if (i != 0) {
+            std::cout << delimiter;
+        }
+        std::cout << "Hello " << defaultString << "!";
+    }
+
+    std::cout << "\n";
+    return 0;
+}
+```
+
+Now, if no `--delimiter` argument is provided, the messages will be printed without any delimiter.
